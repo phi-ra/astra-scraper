@@ -236,6 +236,7 @@ class AstraScraper:
 
 
     def _parse_site(self, soup_obj, file_type):
+        """ expand later on (or keep it that way and process later)"""
         return soup_obj
     
     def _pop_item(self, 
@@ -323,6 +324,10 @@ class AstraScraper:
 
 
 class FedlexScraper:
+    """
+    scraper for the full set of fedlex, isolates the content but also makes use
+    of the sparql endpoint to isolate dependencies across legal articles
+    """
     def __init__(self) -> None:
         # fet full set of uris
         self.full_set = fetch_full_fedlex()
@@ -337,7 +342,9 @@ class FedlexScraper:
                 continue
             print(f"Crawling {legal_entry['titel']}")
             web_string = legal_entry['sr_uri']
-            web_string = re.sub('fedlex.data.admin.ch', 'www.fedlex.admin.ch', web_string)
+            web_string = re.sub('fedlex.data.admin.ch',
+                                'www.fedlex.admin.ch',
+                                web_string)
             web_string = web_string + '/de'
 
             xml_url, in_force_status = isolate_legal_xml(web_string)
