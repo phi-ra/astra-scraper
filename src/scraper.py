@@ -14,6 +14,7 @@ from typing import Optional, Callable
 from .utils.adminlink import isolate_simple
 from .utils.adminlink import detect_javascript
 from legal.helpers import isolate_legal_xml
+from legal.sparqlqueries import fetch_full_fedlex, fetch_citing_art, fetch_cited_by_art
 
 class AstraScraper:
     """
@@ -319,3 +320,51 @@ class AstraScraper:
                     write_path = write_path+'.pkl'
                 with open(write_path, 'wb') as con:
                     pickle.dump(object, con)
+
+
+class FedlexScraper:
+    def __init__(self) -> None:
+        # fet full set of uris
+        self.full_set = fetch_full_fedlex()
+        self.crawled_legal_knowledge = {}
+
+    def _scrap_feldex(self, id_counter=0, reset_counter=0):
+        for legal_entry in self.full_set:
+            # Set up feature to restart crawling if there is an error
+            # use the reset counter if necessary
+            if id_counter <= reset_counter:
+                id_counter += 1
+                continue
+            print(f"Crawling {legal_entry['titel']}")
+            web_string = legal_entry['sr_uri']
+            web_string = re.sub('fedlex.data.admin.ch', 'www.fedlex.admin.ch', web_string)
+            web_string = web_string + '/de'
+
+            xml_url, in_force_status = isolate_legal_xml(web_string)
+
+            crawl_object = requests.get(xml_url)
+            soup = BeautifulSoup(crawl_object.content, 'xml')
+
+            # add some meta
+            try:
+                articles_citing_current = fetch_citing_art(legal_entry['sr_uri'])
+            except:
+                articles_citing_current = {}
+            try:
+                articles_cited_in_current = fetch_cited_by_art(legal_entry['sr_uri'])
+            except:
+                articles_cited_in_current = {}
+
+            legal_entry['citing_article'] = articles_citing_current
+
+            legal_entry['cited_in_article'] = articles_cited_in_current
+
+            # save as pickle
+            with open(f'data/01_raw/01_all/legal/legal_doc_{id_counter}.pkl', 'wb') as con:
+                pickle.dump(soup, con)
+            
+            # add entry to knowledge base
+            self.crawled_legal_knowledge[f'legal_doc_{id_counter}.pkl'] = legal_entry
+
+            id_counter += 1
+            

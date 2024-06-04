@@ -1,0 +1,4 @@
+beautifulsoup4==4.12.3
+Requests==2.32.3
+selenium==4.21.0
+SPARQLWrapper==2.0.0
