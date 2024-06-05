@@ -1,3 +1,6 @@
+"""
+Helper module for webpages that contain javascript
+"""
 import re
 from selenium import webdriver
 from selenium.webdriver import Chrome

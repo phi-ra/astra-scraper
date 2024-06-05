@@ -1,3 +1,6 @@
+"""
+Combiner module for the scraper
+"""
 import os
 import time
 import pickle
@@ -13,12 +16,18 @@ from typing import Optional, Callable
 
 from .utils.adminlink import isolate_simple
 from .utils.adminlink import detect_javascript
-from legal.helpers import isolate_legal_xml
-from legal.sparqlqueries import fetch_full_fedlex, fetch_citing_art, fetch_cited_by_art
+from .legal.helpers import isolate_legal_xml
+from .legal.sparqlqueries import fetch_full_fedlex, fetch_citing_art, fetch_cited_by_art
 
 class AstraScraper:
     """
-    Scraper to get public data from ASTRA
+    Scraper to get public data from FEDRO. On initialization, sets the error iterator or 0
+    this is a safeguard that can later on be changed manually if need be (you might need) this
+    if there is a timeout because you get blocked due to too many requests:) 
+
+    Examples:
+    >>> astra_scraper = AstraScraper()
+    >>> astra_scraper.crawl_page(write_dir='my_write_dir')    
     """
     def __init__(self) -> None:
         self.knowledge_base = {}
@@ -174,6 +183,7 @@ class AstraScraper:
         Gather links from the soup object.
 
         Parameters:
+
         soup_obj (BeautifulSoup): The BeautifulSoup object.
         filter (Callable): A function to filter URLs (default is None).
         filter_string (str): A string to filter URLs (default is None).
@@ -199,6 +209,22 @@ class AstraScraper:
         return new_list
     
     def _process_html(self, url, crawl_object, file_name, **kwargs):
+        """
+        Utility function that checks whether a page can be crawled using 
+        requests or whether there is javascript embedded (which needs selenium)
+
+        Parameters:
+        url (str): the url to be crawled (needed if forwarding is needed)
+        crawl_object (): the object returned from requests.get
+        file_name (str): object name to save (used as passforward)
+
+        returns:
+        parsed_data (bs4): beautifulsoup object
+        file_type (str from list): type of object crawled
+        file_name (str): file name for saving (and linking throughout)
+        linked_docs (dict): docs that are linked on the current html (to be crawled)
+
+        """
         soup = BeautifulSoup(crawl_object.content, 'html.parser')
         is_javascript = detect_javascript(soup)
 

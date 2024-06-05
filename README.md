@@ -1,9 +1,19 @@
 # ASTRA scraper
 
-Contains a simple scraper for the ASTRA webpage.
+Contains a simple scraper for the ASTRA webpage. Basically just grabs everything it can find on the webpage itself and on linked feldex data fields 
+
+## How to use it
+
+Set up your virtual environment and run
+
+```
+pip install -r ./requirements.txt
+python crawly.py --write_dir='path_to_your_write_dir'
+```
+and the optional arguments
 
 ### What it does
-1. Scrapes pages in sequential manner (not really efficient, but for one page it suffices)
+1. Scrapes pages in sequential manner (not really efficient, but for one base page it suffices)
 2. Stores the following filetypes
 	* .pdf
 	* .html
@@ -25,5 +35,13 @@ Contains a simple scraper for the ASTRA webpage.
 	  "neighbours": [a list of all urls of neighbours]
 	}
 	```
+5. For legal documents, there is an additional crawler that uses the [Fedlex SPARQL Endpoint](https://lindas.admin.ch/data-usage/fedlex/) to collect the full set of legal texts and also collect the dependencies specified by the JoLux model. 
 
-Currently supports 
+
+### Get the doc
+
+Docs can be recreated with `sphinx` using the docsource (if need be)
+```
+cd ./docs
+sphinx-build -b html source build
+```

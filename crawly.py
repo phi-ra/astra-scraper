@@ -6,6 +6,9 @@ from src.scraper import AstraScraper
 from src.utils.adminlink import string_filter
 
 def crawly_go_crawl(args):
+    """
+    Crawler utility to be used on a command line call
+    """
     scraper = AstraScraper()
 
     scraper.crawl_page(
