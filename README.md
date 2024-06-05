@@ -38,10 +38,29 @@ and the optional arguments
 5. For legal documents, there is an additional crawler that uses the [Fedlex SPARQL Endpoint](https://lindas.admin.ch/data-usage/fedlex/) to collect the full set of legal texts and also collect the dependencies specified by the JoLux model. 
 
 
-### Get the doc
+### Get the docs
 
 Docs can be recreated with `sphinx` using the docsource (if need be)
 ```
 cd ./docs
 sphinx-build -b html source build
+```
+
+## Overview
+The doctree of the repo is outlined below
+```
+.
+├── README.md
+├── crawly.py
+├── requirements.txt
+└── src
+    ├── __init__.py
+    ├── legal
+    │   ├── __init__.py
+    │   ├── helpers.py
+    │   └── sparqlqueries.py
+    ├── scraper.py
+    └── utils
+        ├── __init__.py
+        └── adminlink.py
 ```
